@@ -5,13 +5,45 @@
 
 //Dependencies
 const http = require('http');
+const https = require('https');
 const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
+const config = require('./config');
+const fs = require('fs');
+
+const _data = require('./lib/data');
+
 // The server should respond to all requests with a string
 
-// Start the server and have it listen on port 3000
-const server = http.createServer(function(req, res){
-    
+// Instantiating the HTTP server 
+const httpServer = http.createServer(function(req, res){
+    unifiedServer(req, res);
+});
+
+// Start the server
+httpServer.listen(config.httpPort, function(){
+    console.log(`The http server is listening on port ${config.httpPort}`);
+});
+
+// Set HTTPS server options
+const httpsServerOptions = {
+    'key' : fs.readFileSync('./https/key.pem'), 
+    'cert' : fs.readFileSync('./https/cert.pem')
+};
+
+// Instantiate HTTPS server
+const httpsServer = https.createServer(httpsServerOptions, function(req, res){
+    unifiedServer(req, res);
+});
+
+
+// Start HTTPS server
+httpsServer.listen(config.httpsPort, function(){
+    console.log(`The server https server is listening on port ${config.httpsPort}`);
+});
+
+// All the server logic for both the hhtp and https server
+const unifiedServer = function(req, res) {
     // Get url and parse it
     let parsedUrl = url.parse(req.url, true);
 
@@ -74,30 +106,22 @@ const server = http.createServer(function(req, res){
 
     
     });
-
-    
-});
-
-server.listen(3000, function(){
-    console.log("The server is listening on port 3000");
-});
+}
 
 // Deifine handlers
 let handlers = {};
-
-// Sample handler
-handlers.sample = function(data, callback){
-    // Callback an http status code and a payload object
-    callback(406, { 'name': 'sample handler' });
-};
 
 // Not found handler
 handlers.notFound = function(data, callback){
     callback(404);
 };
 
+handlers.ping = function(data, callBack){
+    callBack(200);
+};
+
 // Define a request router
 let router = {
-    'sample' : handlers.sample,
-    'notFound' : handlers.notFound
+    'notFound' : handlers.notFound,
+    'ping' : handlers.ping
 }
