@@ -8,10 +8,11 @@ const http = require('http');
 const https = require('https');
 const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
-const config = require('./config');
+const config = require('./lib/config');
 const fs = require('fs');
-
+const handlers = require('./lib/handlers');
 const _data = require('./lib/data');
+const helpers = require('./lib/helpers');
 
 // The server should respond to all requests with a string
 
@@ -80,11 +81,11 @@ const unifiedServer = function(req, res) {
             'queryStringObject' : queryStringObject,
             'method' : method,
             'headers' : headers,
-            'payload' : buffer
+            'payload' : helpers.parseJsonToObject(buffer),
         };
 
         // Route the request to the handler specified in the router
-        chosenHandler(data, function(statusCode,payload){
+        chosenHandler(data, function(statusCode, payload){
             // Use the status code calledback by the handler or default to 200
             statusCode = typeof(statusCode) === 'number' ? statusCode : 200;
 
@@ -108,20 +109,9 @@ const unifiedServer = function(req, res) {
     });
 }
 
-// Deifine handlers
-let handlers = {};
-
-// Not found handler
-handlers.notFound = function(data, callback){
-    callback(404);
-};
-
-handlers.ping = function(data, callBack){
-    callBack(200);
-};
-
 // Define a request router
 let router = {
     'notFound' : handlers.notFound,
-    'ping' : handlers.ping
+    'ping' : handlers.ping,
+    'users' : handlers.users,
 }
