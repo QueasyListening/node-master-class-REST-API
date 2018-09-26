@@ -114,4 +114,5 @@ let router = {
     'notFound' : handlers.notFound,
     'ping' : handlers.ping,
     'users' : handlers.users,
+    'tokens': handlers.tokens,
 }
