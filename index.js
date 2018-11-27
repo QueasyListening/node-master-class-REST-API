@@ -52,7 +52,7 @@ const unifiedServer = function(req, res) {
     let path = parsedUrl.pathname;
     let trimmedPath = path.replace(/^\/+|\/+$/g,'');
 
-    // Get the query sting as an objcet
+    // Get the query string as an objcet
     let queryStringObject = parsedUrl.query;
     // Get the HTTP method
     let method = req.method.toLowerCase();
@@ -115,4 +115,5 @@ let router = {
     'ping' : handlers.ping,
     'users' : handlers.users,
     'tokens': handlers.tokens,
+    'checks': handlers.checks,
 }
